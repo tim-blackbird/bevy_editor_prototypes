@@ -49,12 +49,13 @@ pub(crate) fn spawn_pane<'a>(
         .id();
 
     // Header
-    commands
+    let header = commands
         .spawn((
             NodeBundle {
                 background_color: theme.pane_header_background_color,
                 border_radius: theme.pane_header_border_radius,
                 style: Style {
+                    column_gap: Val::Px(5.),
                     padding: UiRect::axes(Val::Px(5.), Val::Px(3.)),
                     width: Val::Percent(100.),
                     height: Val::Px(27.),
@@ -65,8 +66,6 @@ pub(crate) fn spawn_pane<'a>(
             },
             PaneHeaderNode,
         ))
-        .observe(on_pane_header_right_click)
-        .observe(on_pane_header_middle_click)
         .observe(
             move |_trigger: Trigger<Pointer<Move>>,
                   window_query: Query<Entity, With<Window>>,
@@ -94,7 +93,16 @@ pub(crate) fn spawn_pane<'a>(
                 font_size: 14.,
                 ..default()
             },
-        ));
+        ))
+        .id();
+
+    spawn_header_button(commands, theme, "Remove")
+        .observe(on_pane_click_remove)
+        .set_parent(header);
+
+    spawn_header_button(commands, theme, "Split")
+        .observe(on_pane_click_split)
+        .set_parent(header);
 
     // Content
     commands
@@ -272,6 +280,51 @@ pub(crate) fn spawn_resize_handle<'a>(
                     Divider::Horizontal => SystemCursorIcon::EwResize,
                     Divider::Vertical => SystemCursorIcon::NsResize,
                 }));
+        },
+    )
+    .observe(
+        |_trigger: Trigger<Pointer<Out>>,
+         window_query: Query<Entity, With<Window>>,
+         mut commands: Commands| {
+            let window = window_query.single();
+            commands
+                .entity(window)
+                .insert(CursorIcon::System(SystemCursorIcon::Default));
+        },
+    );
+    ec
+}
+
+pub(super) fn spawn_header_button<'a>(
+    commands: &'a mut Commands,
+    theme: &Theme,
+    label: impl Into<String>,
+) -> EntityCommands<'a> {
+    let mut ec = commands.spawn(NodeBundle {
+        background_color: theme.pane_header_button_background_color,
+        border_radius: BorderRadius::all(Val::Px(2.)),
+        style: Style {
+            padding: UiRect::all(Val::Px(2.)),
+
+            ..default()
+        },
+        ..default()
+    });
+    ec.with_child((
+        Text::new(label),
+        TextFont {
+            font_size: 10.,
+            ..default()
+        },
+    ))
+    .observe(
+        move |_trigger: Trigger<Pointer<Move>>,
+              window_query: Query<Entity, With<Window>>,
+              mut commands: Commands| {
+            let window = window_query.single();
+            commands
+                .entity(window)
+                .insert(CursorIcon::System(SystemCursorIcon::Pointer));
         },
     )
     .observe(

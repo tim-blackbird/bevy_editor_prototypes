@@ -19,6 +19,8 @@ pub struct Theme {
     pub background_color: BackgroundColor,
     /// The background color of the panes in the editor.
     pub pane_header_background_color: BackgroundColor,
+    /// The background color of buttons in pane headers.
+    pub pane_header_button_background_color: BackgroundColor,
     /// The background color of the content area of panes.
     pub pane_area_background_color: BackgroundColor,
     /// The text color of the editor.
@@ -36,6 +38,7 @@ impl Default for Theme {
         Self {
             background_color: BackgroundColor(Color::oklch(0.27, 0.0, 0.0)),
             pane_header_background_color: BackgroundColor(Color::oklch(0.215, 0.0, 0.0)),
+            pane_header_button_background_color: BackgroundColor(Color::oklch(0.3, 0., 0.)),
             pane_area_background_color: BackgroundColor(Color::oklch(0.23, 0.0, 0.0)),
             text_color: Color::oklch(0.9219, 0.0, 0.0),
             menu_bar_color: BackgroundColor(Color::oklch(0.209, 0.0, 0.0)),

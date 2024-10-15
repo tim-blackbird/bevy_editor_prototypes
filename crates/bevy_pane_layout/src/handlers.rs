@@ -7,7 +7,7 @@ use crate::{
 };
 
 /// Middle clicking removes the pane.
-pub(crate) fn on_pane_header_middle_click(
+pub(crate) fn on_pane_click_remove(
     trigger: Trigger<Pointer<Click>>,
     mut commands: Commands,
     parent_query: Query<&Parent>,
@@ -15,14 +15,14 @@ pub(crate) fn on_pane_header_middle_click(
     root_query: Query<(), With<RootPaneLayoutNode>>,
     mut size_query: Query<&mut Size>,
 ) {
-    if trigger.event().button != PointerButton::Middle {
+    if trigger.event().button != PointerButton::Primary {
         return;
     }
 
     // Grab the id of the pane root
     let target = parent_query
         .iter_ancestors(trigger.entity())
-        .nth(1)
+        .nth(2)
         .unwrap();
 
     let parent = parent_query.get(target).unwrap().get();
@@ -69,7 +69,7 @@ pub(crate) fn on_pane_header_middle_click(
 /// Right clicking dividers the pane horizontally
 /// Holding left shift and right clicking dividers the pane vertically
 #[expect(clippy::too_many_arguments)]
-pub(crate) fn on_pane_header_right_click(
+pub(crate) fn on_pane_click_split(
     trigger: Trigger<Pointer<Click>>,
     mut commands: Commands,
     input: Res<ButtonInput<KeyCode>>,
@@ -80,7 +80,7 @@ pub(crate) fn on_pane_header_right_click(
     children_query: Query<&Children>,
     parent_query: Query<&Parent>,
 ) {
-    if trigger.event().button != PointerButton::Secondary {
+    if trigger.event().button != PointerButton::Primary {
         return;
     }
 
@@ -93,7 +93,7 @@ pub(crate) fn on_pane_header_right_click(
     // Grab the id of the pane root
     let target = parent_query
         .iter_ancestors(trigger.entity())
-        .nth(1)
+        .nth(2)
         .unwrap();
 
     let pane = pane_root_query.get(target).unwrap();
